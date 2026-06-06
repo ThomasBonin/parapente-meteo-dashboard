@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1b2a">
+<title>🪂 Parapente Val Louron</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1b2a;
+  --surface: #142030;
+  --surface2: #1a2d42;
+  --border: #243a52;
+  --text: #dce8f5;
+  --muted: #6b8caa;
+  --green: #2d7d4e;
+  --green-text: #52d68a;
+  --orange: #a05a00;
+  --orange-text: #ffaa33;
+  --red: #8b1a1a;
+  --red-text: #ff5555;
+  --blue: #4fc3f7;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ═══ HEADER ═══ */
+header {
+  background: var(--surface);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.header-left h1 { font-size: 17px; font-weight: 700; }
+.header-left .subtitle { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.refresh-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--blue);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.last-update { font-size: 11px; color: var(--muted); }
+
+/* ═══ TABS ═══ */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  padding: 0 12px;
+  gap: 4px;
+}
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-date { font-size: 10px; font-weight: 400; display: block; }
+.tab-lowconf { opacity: 0.75; font-style: italic; }
+.tab-lowconf::after { content: '~'; font-size: 9px; color: #b06000; vertical-align: super; margin-left: 2px; }
+.conf-banner { background: #2a1f00; border: 1px solid #b06000; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #e8a020; display: flex; align-items: center; gap: 8px; }
+.conf-banner.low { background: #200808; border-color: #8b1a1a; color: #e05050; }
+
+/* ═══ PANELS ═══ */
+.day-panel { display: none; padding: 12px; }
+.day-panel.active { display: block; }
+
+/* ═══ ALERTS ═══ */
+.alerts-container { margin-bottom: 12px; }
+.alert-item {
+  background: var(--red);
+  border: 1px solid var(--red-text);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ═══ CARDS ═══ */
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  overflow: hidden;
+}
+.card-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* ═══ SCORE BANNER ═══ */
+.score-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.score-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.score-number { font-size: 48px; font-weight: 900; line-height: 1; }
+.score-denom { font-size: 18px; color: var(--muted); }
+.score-window { font-size: 12px; }
+
+/* ═══ TIMELINE ═══ */
+.timeline-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 14px;
+}
+.slots {
+  display: flex;
+  gap: 6px;
+  height: 100%;
+}
+.slot {
+  flex: 1;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.slot-hour { font-size: 13px; font-weight: 700; color: var(--muted); }
+.slot-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+}
+.dot-green { background: #2d7d4e; }
+.dot-orange { background: #b06000; }
+.dot-red { background: #8b1a1a; }
+.slot-meta { font-size: 10px; color: var(--muted); line-height: 1.3; }
+
+/* ═══ GRID LAYOUTS ═══ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+.mb12 { margin-bottom: 12px; }
+
+/* ═══ WIND ═══ */
+.wind-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wind-compass {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+.wind-arrow-svg {
+  transition: transform 0.6s ease;
+}
+.wind-speed-val { font-size: 32px; font-weight: 800; }
+.wind-speed-unit { font-size: 13px; color: var(--muted); }
+.wind-info-row { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.badge-red { background: var(--red); color: var(--red-text); border: 1px solid var(--red-text); }
+.badge-orange { background: var(--orange); color: var(--orange-text); border: 1px solid var(--orange-text); }
+
+/* ═══ ALTITUDE TABLE ═══ */
+.alt-table { width: 100%; border-collapse: collapse; }
+.alt-table td { padding: 6px 4px; font-size: 13px; vertical-align: middle; }
+.alt-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+.alt-level { font-size: 10px; color: var(--muted); display: block; }
+.alt-dir { display: flex; align-items: center; gap: 6px; }
+.mini-arrow { display: inline-block; font-size: 16px; transition: transform 0.4s; }
+
+/* ═══ CONVECTION ═══ */
+.conv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.conv-item {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.conv-value { font-size: 26px; font-weight: 800; line-height: 1; }
+.conv-label { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.conv-status { font-size: 10px; margin-top: 4px; }
+
+/* ═══ HOURLY TABLE ═══ */
+.hourly-table { width: 100%; border-collapse: collapse; }
+.hourly-table th { font-size: 10px; color: var(--muted); text-transform: uppercase; padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border); }
+.hourly-table th:first-child { text-align: left; }
+.hourly-table td { padding: 7px 8px; font-size: 12px; text-align: right; border-bottom: 1px solid var(--border); }
+.hourly-table td:first-child { text-align: left; font-weight: 700; }
+.hourly-table tr:last-child td { border-bottom: none; }
+
+/* ═══ IFRAME WRAPPERS ═══ */
+.iframe-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+.iframe-wrap iframe { width: 100%; border: none; display: block; }
+.iframe-link {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: var(--blue);
+  text-decoration: none;
+  margin-top: 6px;
+}
+
+/* ═══ WEBCAM ═══ */
+.webcam-frame {
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ═══ COLORS ═══ */
+.c-green { color: var(--green-text); }
+.c-orange { color: var(--orange-text); }
+.c-red { color: var(--red-text); }
+.c-muted { color: var(--muted); }
+
+/* ═══ LOADING ═══ */
+#loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 16px;
+  color: var(--muted);
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══ RESPONSIVE TABLET ═══ */
+@media (max-width: 800px) {
+  .score-row { grid-template-columns: 1fr; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>🪂 Parapente — Val Louron</h1>
+    <div class="subtitle">Décollage du 600 · Génos-Loudenvielle</div>
+  </div>
+  <div class="header-right">
+    <button class="refresh-btn" onclick="init()">⟳ Actualiser</button>
+    <span class="last-update" id="lastUpdate">—</span>
+  </div>
+</header>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" onclick="switchDay(0)">
+    Aujourd'hui<span class="tab-date" id="tab-date-0"></span>
+  </div>
+  <div class="tab" onclick="switchDay(1)">
+    Demain<span class="tab-date" id="tab-date-1"></span>
+  </div>
+  <div class="tab" onclick="switchDay(2)">
+    J+2<span class="tab-date" id="tab-date-2"></span>
+  </div>
+  <div class="tab" onclick="switchDay(3)">
+    J+3<span class="tab-date" id="tab-date-3"></span>
+  </div>
+  <div class="tab tab-lowconf" onclick="switchDay(4)">
+    J+4<span class="tab-date" id="tab-date-4"></span>
+  </div>
+  <div class="tab tab-lowconf" onclick="switchDay(5)">
+    J+5<span class="tab-date" id="tab-date-5"></span>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div>Chargement des données météo...</div>
+</div>
+
+<div id="day-0" class="day-panel"></div>
+<div id="day-1" class="day-panel"></div>
+<div id="day-2" class="day-panel"></div>
+<div id="day-3" class="day-panel"></div>
+<div id="day-4" class="day-panel"></div>
+<div id="day-5" class="day-panel"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const LAT = 42.795;
+const LON = 0.404;
+const WIND_LIMIT = 30;          // km/h — seuil rouge
+const WIND_WARN = 22;           // km/h — seuil orange
+const SOUTH_MIN = 135;
+const SOUTH_MAX = 225;
+const SLOTS = [7, 9, 11, 13, 15, 17];
+
+const WINDY_EMBED = `https://embed.windy.com/embed2.html?lat=${LAT}&lon=${LON}&detailLat=${LAT}&detailLon=${LON}&width=800&height=430&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+const WINDY_METEOGRAM = `https://www.windy.com/${LAT}/${LON}/meteogram?${LAT},${LON},12`;
+const SYNOPTIC_EMBED = `https://embed.windy.com/embed2.html?lat=46&lon=2&zoom=4&level=surface&overlay=pressure&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+const METOFFICE_URL = `https://weather.metoffice.gov.uk/maps-and-charts/surface-pressure`;
+const WEBCAM_URL = `https://www.skaping.com/loudenvielle/tour-de-genos`;
+
+// ══════════════════════════════════════════
+//  OPEN-METEO FETCH
+// ══════════════════════════════════════════
+async function fetchWeather() {
+  const vars = [
+    'temperature_2m', 'dewpoint_2m',
+    'windspeed_10m', 'winddirection_10m', 'windgusts_10m',
+    'cloudcover', 'cloudcover_low', 'cloudcover_mid', 'cloudcover_high',
+    'precipitation', 'cape', 'lifted_index',
+    'windspeed_1000hPa','winddirection_1000hPa','temperature_1000hPa',
+    'windspeed_925hPa', 'winddirection_925hPa', 'temperature_925hPa',
+    'windspeed_850hPa', 'winddirection_850hPa', 'temperature_850hPa',
+    'windspeed_700hPa', 'winddirection_700hPa', 'temperature_700hPa',
+    'windspeed_500hPa', 'winddirection_500hPa', 'temperature_500hPa',
+    'windspeed_300hPa', 'winddirection_300hPa', 'temperature_300hPa'
+  ].join(',');
+
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=${vars}&wind_speed_unit=kmh&forecast_days=7&timezone=Europe%2FParis`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`API ${r.status}`);
+  return r.json();
+}
+
+// ══════════════════════════════════════════
+//  DATA HELPERS
+// ══════════════════════════════════════════
+function getIdx(hourlyData, dayOffset, targetHour) {
+  const times = hourlyData.time;
+  const baseDate = times[0].substring(0, 10);
+  const d = new Date(baseDate + 'T12:00:00');
+  d.setDate(d.getDate() + dayOffset);
+  const dateStr = d.toISOString().substring(0, 10);
+  const target = `${dateStr}T${String(targetHour).padStart(2, '0')}:00`;
+  return times.indexOf(target);
+}
+
+function getHour(h, idx) {
+  if (idx === -1) return null;
+  return {
+    temp:       h.temperature_2m[idx],
+    dew:        h.dewpoint_2m[idx],
+    ws:         h.windspeed_10m[idx],
+    wd:         h.winddirection_10m[idx],
+    gusts:      h.windgusts_10m[idx],
+    cloud:      h.cloudcover[idx],
+    precip:     h.precipitation[idx],
+    cape:       h.cape[idx],
+    li:         h.lifted_index[idx],
+    cloudLow:   h.cloudcover_low[idx],
+    cloudMid:   h.cloudcover_mid[idx],
+    cloudHigh:  h.cloudcover_high[idx],
+    ws1000: h.windspeed_1000hPa[idx], wd1000: h.winddirection_1000hPa[idx], t1000: h.temperature_1000hPa[idx],
+    ws925:  h.windspeed_925hPa[idx],  wd925:  h.winddirection_925hPa[idx],  t925:  h.temperature_925hPa[idx],
+    ws850:  h.windspeed_850hPa[idx],  wd850:  h.winddirection_850hPa[idx],  t850:  h.temperature_850hPa[idx],
+    ws700:  h.windspeed_700hPa[idx],  wd700:  h.winddirection_700hPa[idx],  t700:  h.temperature_700hPa[idx],
+    ws500:  h.windspeed_500hPa[idx],  wd500:  h.winddirection_500hPa[idx],  t500:  h.temperature_500hPa[idx],
+    ws300:  h.windspeed_300hPa[idx],  wd300:  h.winddirection_300hPa[idx],  t300:  h.temperature_300hPa[idx],
+    cloudBase:  Math.round((h.temperature_2m[idx] - h.dewpoint_2m[idx]) * 125)
+  };
+}
+
+function getDayDate(hourlyData, dayOffset) {
+  const base = new Date(hourlyData.time[0].substring(0, 10) + 'T12:00:00');
+  base.setDate(base.getDate() + dayOffset);
+  return base;
+}
+
+const DAYS_FR   = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const MONTHS_FR = ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+function fmtDate(d) {
+  return `${DAYS_FR[d.getDay()]} ${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+}
+function fmtDateShort(d) {
+  return `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+}
+
+// ══════════════════════════════════════════
+//  SCORING
+// ══════════════════════════════════════════
+function scoreHour(d) {
+  if (!d) return { score: 0, alerts: ['Données manquantes'] };
+  let score = 10;
+  const alerts = [];
+
+  // Vent vitesse
+  if (d.ws > WIND_LIMIT) {
+    score -= 5; alerts.push(`Vent fort ${Math.round(d.ws)} km/h`);
+  } else if (d.ws > WIND_WARN) {
+    score -= 2;
+  } else if (d.ws > 15) {
+    score -= 1;
+  }
+
+  // Vent direction SUD
+  const isSouth = d.wd >= SOUTH_MIN && d.wd <= SOUTH_MAX;
+  const isNearSouth = (d.wd >= 112 && d.wd < SOUTH_MIN) || (d.wd > SOUTH_MAX && d.wd <= 248);
+  if (isSouth) {
+    score -= 4; alerts.push('Vent du SUD ⚠️');
+  } else if (isNearSouth) {
+    score -= 2;
+  }
+
+  // Rafales
+  const gustDiff = d.gusts - d.ws;
+  if (gustDiff > 12) {
+    score -= 2; alerts.push('Rafales importantes (écart > 12 km/h)');
+  } else if (gustDiff > 8) {
+    score -= 1;
+  }
+
+  // Précipitations
+  if (d.precip > 0.1) {
+    score -= 5; alerts.push('Précipitations');
+  }
+
+  // LI
+  const li = d.li;
+  if (li !== null && li !== undefined) {
+    if (li < -3)      { score -= 3; alerts.push(`LI = ${li.toFixed(1)} ⛈️`); }
+    else if (li < -1) { score -= 1; }
+  }
+
+  // CAPE
+  const cape = d.cape || 0;
+  if (cape > 1000)      { score -= 2; alerts.push(`CAPE ${Math.round(cape)} J/kg`); }
+  else if (cape > 500)  { score -= 1; }
+
+  // Base nuages sous le décollage → vol impossible
+  if (d.cloudBase < DECOLLAGE_ALT_M) {
+    score = Math.min(score - 5, 2); // plafonné à 2/10 max, jamais vert
+    alerts.push('Plafond sous le décollage ⛔');
+  } else if (d.cloudBase < 2000) {
+    score -= 2; alerts.push('Plafond bas');
+  }
+
+  return { score: Math.max(0, score), alerts };
+}
+
+function slotColor(s) {
+  if (s >= 7) return 'dot-green';
+  if (s >= 4) return 'dot-orange';
+  return 'dot-red';
+}
+function textColor(s) {
+  if (s >= 7) return 'c-green';
+  if (s >= 4) return 'c-orange';
+  return 'c-red';
+}
+function overallScore(slotScores) {
+  // Pondération : matin (7h,9h,11h) x2, après-midi (13h,15h,17h) x1
+  const weights = SLOTS.map((h) => h <= 11 ? 2 : 1);
+  const total = slotScores.reduce((a, s, i) => a + s.score * (weights[i] ?? 1), 0);
+  const maxW = weights.reduce((a, b) => a + b, 0);
+  return Math.round(total / maxW);
+}
+function bestWindow(slotScores) {
+  const good = SLOTS.filter((h, i) => slotScores[i].score >= 6);
+  if (!good.length) return '⛔ Pas de créneau favorable';
+  if (good.length === SLOTS.length) return `✅ Toute la journée`;
+  return `✅ ${good[0]}h — ${good[good.length - 1]}h`;
+}
+
+// ══════════════════════════════════════════
+//  WIND DISPLAY
+// ══════════════════════════════════════════
+const DIR_NAMES = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+function dirName(deg) {
+  return DIR_NAMES[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
+}
+
+// SVG arrow that points FROM the wind origin (conventional met reading)
+function compassSVG(deg, size = 60) {
+  // deg = "wind from" direction. Arrow points toward where wind blows.
+  const angleTo = (deg + 180) % 360; // wind goes TO this direction
+  return `
+  <svg width="${size}" height="${size}" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="28" fill="none" stroke="#243a52" stroke-width="1.5"/>
+    <text x="30" y="9" text-anchor="middle" fill="#6b8caa" font-size="8">N</text>
+    <text x="30" y="56" text-anchor="middle" fill="#6b8caa" font-size="8">S</text>
+    <text x="6"  y="33" text-anchor="middle" fill="#6b8caa" font-size="8">O</text>
+    <text x="54" y="33" text-anchor="middle" fill="#6b8caa" font-size="8">E</text>
+    <g transform="rotate(${angleTo}, 30, 30)">
+      <polygon points="30,8 26,36 30,32 34,36" fill="#4fc3f7"/>
+      <polygon points="30,52 26,36 30,40 34,36" fill="#243a52"/>
+    </g>
+  </svg>`;
+}
+
+function miniArrow(deg) {
+  return `<span class="mini-arrow" style="transform:rotate(${(deg+180)%360}deg)">↑</span>`;
+}
+
+// ══════════════════════════════════════════
+//  BUILD HTML
+// ══════════════════════════════════════════
+function renderDay(dayIndex, hourly) {
+  const panel = document.getElementById(`day-${dayIndex}`);
+  const date  = getDayDate(hourly, dayIndex);
+
+  // Collect data for each slot
+  const slotData   = SLOTS.map(h => getHour(hourly, getIdx(hourly, dayIndex, h)));
+  const slotScores = slotData.map(scoreHour);
+  const overall    = overallScore(slotScores);
+  const window_    = bestWindow(slotScores);
+
+  // All unique alerts
+  const allAlerts = [...new Set(slotScores.flatMap(s => s.alerts))];
+
+  // Reference data: 9h slot (index 1)
+  const ref = slotData[1] || slotData.find(d => d !== null);
+
+  // URLs Windy spécifiques au jour
+  const noonMs = new Date(date).setHours(12, 0, 0, 0);
+  const synopticDayUrl = `https://embed.windy.com/embed2.html?lat=46&lon=2&zoom=4&level=surface&overlay=pressure&product=ecmwf&menu=&message=&marker=&calendar=${noonMs}&pressure=true&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+  const windyMeteogramDay = `https://www.windy.com/${LAT}/${LON}/meteogram?${LAT},${LON},12`;
+  const windyAirgramDay   = `https://www.windy.com/${LAT}/${LON}/airgram?${LAT},${LON},12`;
+
+  let html = '';
+
+  // ── BANDEAU CONFIANCE (J+4 / J+5) ──
+  if (dayIndex === 4) {
+    html += `<div class="conf-banner">⚠️ <strong>J+4 — Confiance modérée (~50-60%)</strong> : les modèles commencent à diverger. Tendances utiles, détails à vérifier à J-1.</div>`;
+  } else if (dayIndex === 5) {
+    html += `<div class="conf-banner low">⛔ <strong>J+5 — Confiance faible (~30-40%)</strong> : grandes tendances uniquement (perturbation, anticyclone). Ne pas prendre de décision définitive sur cette base.</div>`;
+  }
+
+  // ── ALERTS ──
+  if (allAlerts.length) {
+    html += `<div class="alerts-container">`;
+    allAlerts.forEach(a => {
+      html += `<div class="alert-item">⚠️ ${a}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── SCORE + TIMELINE ──
+  html += `<div class="score-row mb12">
+    <div class="score-card">
+      <div class="score-label">${fmtDate(date)}</div>
+      <div class="score-number ${textColor(overall)}">${overall}<span class="score-denom">/10</span></div>
+      <div class="score-window">${window_}</div>
+    </div>
+    <div class="timeline-card">
+      <div class="card-title">Créneaux de vol</div>
+      <div class="slots">
+        ${SLOTS.map((h, i) => {
+          const s = slotScores[i].score;
+          const d = slotData[i];
+          const isSouth = d && d.wd >= SOUTH_MIN && d.wd <= SOUTH_MAX;
+          return `<div class="slot">
+            <div class="slot-hour">${h}h</div>
+            <div class="slot-dot ${slotColor(s)} ${textColor(s)}">${s}</div>
+            ${d ? `
+            <div class="slot-meta">
+              ${Math.round(d.ws)} km/h<br>
+              ${dirName(d.wd)}${isSouth ? ' ⚠️' : ''}
+            </div>` : `<div class="slot-meta c-muted">N/A</div>`}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+
+  // ── WEBCAM (J only) + SYNOPTIQUE ──
+  html += `<div class="grid-2 mb12">`;
+
+  if (dayIndex === 0) {
+    html += `<div class="card">
+      <div class="card-title">📷 Webcam — Tour de Génos</div>
+      <div class="webcam-frame">
+        <iframe
+          src="${WEBCAM_URL}"
+          style="width:100%;height:210px;border:none"
+          title="Webcam Génos"
+          loading="lazy"
+        ></iframe>
+      </div>
+      <a class="iframe-link" href="${WEBCAM_URL}" target="_blank">Ouvrir en plein écran ↗</a>
+    </div>`;
+  }
+
+  // Synoptique — isobares via Windy (timestamp ciblé sur le jour)
+  html += `<div class="card">
+    <div class="card-title">🌍 Carte synoptique — isobares Europe</div>
+    <div class="iframe-wrap">
+      <iframe
+        src="${synopticDayUrl}"
+        style="height:210px"
+        title="Carte synoptique isobares"
+        loading="lazy"
+        allowfullscreen
+      ></iframe>
+    </div>
+    <a class="iframe-link" href="${METOFFICE_URL}" target="_blank">Met Office Surface Pressure ↗</a>
+  </div>`;
+
+  html += `</div>`; // end grid-2
+
+
+  // ── TABLEAU HORAIRE DÉTAILLÉ ──
+  html += `<div class="card mb12">
+    <div class="card-title">📋 Détail horaire</div>
+    <div style="overflow-x:auto">
+      <table class="hourly-table">
+        <thead>
+          <tr>
+            <th>Heure</th>
+            <th>Vent</th>
+            <th>Dir.</th>
+            <th>Rafales</th>
+            <th>Nuages</th>
+            <th>Précip.</th>
+            <th>LI</th>
+            <th>CAPE</th>
+            <th>Base ☁️</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${SLOTS.map((h, i) => {
+            const d = slotData[i];
+            const s = slotScores[i].score;
+            const isSouth = d && d.wd >= SOUTH_MIN && d.wd <= SOUTH_MAX;
+            if (!d) return `<tr><td>${h}h</td><td colspan="8" class="c-muted">N/A</td></tr>`;
+            return `<tr>
+              <td>${h}h <span class="slot-dot ${slotColor(s)}" style="width:18px;height:18px;font-size:9px;display:inline-flex">${s}</span></td>
+              <td class="${d.ws > WIND_LIMIT ? 'c-red' : d.ws > WIND_WARN ? 'c-orange' : 'c-green'}">${Math.round(d.ws)} km/h</td>
+              <td class="${isSouth ? 'c-red' : ''}">${miniArrow(d.wd)} ${dirName(d.wd)}${isSouth ? ' ⚠️' : ''}</td>
+              <td class="${(d.gusts - d.ws) > 10 ? 'c-orange' : ''}">${Math.round(d.gusts)} km/h</td>
+              <td>${Math.round(d.cloud)}%</td>
+              <td class="${d.precip > 0 ? 'c-red' : ''}">${d.precip > 0 ? d.precip.toFixed(1) + ' mm' : '—'}</td>
+              <td class="${d.li < -2 ? 'c-red' : d.li < 0 ? 'c-orange' : 'c-green'}">${d.li !== null ? d.li.toFixed(1) : 'N/A'}</td>
+              <td class="${d.cape > 500 ? 'c-red' : d.cape > 200 ? 'c-orange' : ''}">${Math.round(d.cape)}</td>
+              <td class="${d.cloudBase < 1500 ? 'c-red' : d.cloudBase < 2000 ? 'c-orange' : 'c-green'}">${d.cloudBase} m</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+  // ── CONVECTION ──
+  if (ref) {
+    const li = ref.li;
+    const cape = ref.cape || 0;
+    const cb = ref.cloudBase;
+    html += `<div class="card mb12">
+      <div class="card-title">⚡ Convection thermique — 9h</div>
+      <div class="conv-grid">
+        <div class="conv-item">
+          <div class="conv-value ${li < -2 ? 'c-red' : li < 0 ? 'c-orange' : 'c-green'}">${li !== null ? li.toFixed(1) : 'N/A'}</div>
+          <div class="conv-label">Lifted Index</div>
+          <div class="conv-status ${li < -2 ? 'c-red' : li < 0 ? 'c-orange' : 'c-green'}">
+            ${li < -3 ? 'Convection forte ⛈️' : li < -1 ? 'Instable 🟠' : li < 0 ? 'Légèrement instable' : 'Stable ✅'}
+          </div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-value ${cape > 500 ? 'c-red' : cape > 200 ? 'c-orange' : 'c-green'}">${Math.round(cape)}</div>
+          <div class="conv-label">CAPE (J/kg)</div>
+          <div class="conv-status ${cape > 500 ? 'c-red' : cape > 200 ? 'c-orange' : 'c-green'}">
+            ${cape > 1000 ? 'Orageux ⛈️' : cape > 500 ? 'Élevé ⚠️' : cape > 200 ? 'Modéré 🟠' : 'Faible ✅'}
+          </div>
+        </div>
+        <div class="conv-item">
+          <div class="conv-value ${cb < 1500 ? 'c-red' : cb < 2000 ? 'c-orange' : 'c-green'}">${Math.round(cb / 100) * 100} m</div>
+          <div class="conv-label">Base nuages est.</div>
+          <div class="conv-status ${cb < 1500 ? 'c-red' : cb < 2000 ? 'c-orange' : 'c-green'}">
+            ${cb < 1500 ? 'Trop bas ⛔' : cb < 2000 ? 'Limite 🟠' : 'Vol OK ✅'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── MÉTÉOGRAMME CUSTOM ──
+  html += `<div class="card mb12">
+    <div class="card-title">📊 Météogramme — ${fmtDate(date)}</div>
+    <canvas id="meteogram-${dayIndex}" width="800" height="370"
+      style="width:100%;border-radius:6px;display:block"></canvas>
+  </div>`;
+
+  // ── AIRGRAM CUSTOM ──
+  html += `<div class="card mb12">
+    <div class="card-title">🌬️ Airgram — barbes de vent par niveau</div>
+    <canvas id="airgram-${dayIndex}" width="800" height="270"
+      style="width:100%;border-radius:6px;display:block"></canvas>
+  </div>`;
+
+  panel.innerHTML = html;
+
+  // Draw after DOM is updated
+  requestAnimationFrame(() => {
+    drawMeteogramCanvas(`meteogram-${dayIndex}`, hourly, dayIndex);
+    drawAirgramCanvas(`airgram-${dayIndex}`, hourly, dayIndex);
+  });
+}
+
+// ── Sub-components ──
+function windCard(d) {
+  const ws = d.ws;
+  const isSouth = d.wd >= SOUTH_MIN && d.wd <= SOUTH_MAX;
+  const gustDiff = d.gusts - ws;
+  const wsColor = ws > WIND_LIMIT ? 'c-red' : ws > WIND_WARN ? 'c-orange' : 'c-green';
+  return `
+  <div class="wind-main">
+    <div class="wind-compass">${compassSVG(d.wd)}</div>
+    <div>
+      <div>
+        <span class="wind-speed-val ${wsColor}">${Math.round(ws)}</span>
+        <span class="wind-speed-unit"> km/h</span>
+        ${ws > WIND_LIMIT ? `<span class="badge badge-red">⛔ > ${WIND_LIMIT} km/h</span>` : ''}
+      </div>
+      <div class="wind-info-row">
+        Direction : <strong>${dirName(d.wd)} (${Math.round(d.wd)}°)</strong>
+        ${isSouth ? `<span class="badge badge-red">SUD ⚠️</span>` : ''}
+      </div>
+      <div class="wind-info-row ${gustDiff > 10 ? 'c-orange' : ''}">
+        Rafales : ${Math.round(d.gusts)} km/h
+        <span class="c-muted">(+${Math.round(gustDiff)} km/h)</span>
+        ${gustDiff > 10 ? `<span class="badge badge-orange">Turbulent</span>` : ''}
+      </div>
+      <div class="wind-info-row c-muted">Nébulosité : ${Math.round(d.cloud)}%</div>
+    </div>
+  </div>`;
+}
+
+function altTable(d) {
+  const rows = [
+    { label: '850 hPa', alt: '~1500 m', ws: d.ws850, wd: d.wd850 },
+    { label: '700 hPa', alt: '~3000 m', ws: d.ws700, wd: d.wd700 },
+    { label: '500 hPa', alt: '~5500 m', ws: d.ws500, wd: d.wd500 },
+  ];
+  return `<table class="alt-table">
+    ${rows.map(r => {
+      const isSouth = r.wd >= SOUTH_MIN && r.wd <= SOUTH_MAX;
+      const wsColor = r.ws > 60 ? 'c-red' : r.ws > 40 ? 'c-orange' : '';
+      return `<tr>
+        <td><span class="alt-level">${r.label}</span>${r.alt}</td>
+        <td><div class="alt-dir">${miniArrow(r.wd)} <span class="${isSouth ? 'c-red' : ''}">${dirName(r.wd)}</span></div></td>
+        <td class="${wsColor}" style="text-align:right"><strong>${Math.round(r.ws)} km/h</strong></td>
+      </tr>`;
+    }).join('')}
+  </table>`;
+}
+
+// ══════════════════════════════════════════
+//  METEOGRAM + AIRGRAM CANVAS
+// ══════════════════════════════════════════
+
+const METEO_HOURS = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const AIRGRAM_HOURS = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+const DECOLLAGE_ALT_M   = 1600; // Décollage du 600 ~ 1600m MSL
+const ATTERRISSAGE_ALT_M = 950; // Atterrissage vallée Loudenvielle ~ 950m MSL
+const PRESSURE_LEVELS = [
+  { key:'300',  label:'300 hPa', alt:'~9km'   },
+  { key:'500',  label:'500 hPa', alt:'~5.5km' },
+  { key:'700',  label:'700 hPa', alt:'~3km'   },
+  { key:'850',  label:'850 hPa', alt:'~1.5km' },
+  { key:'925',  label:'925 hPa', alt:'~750m'  },
+  { key:'1000', label:'1000 hPa',alt:'~sol'   },
+];
+
+function tempToHue(t) {
+  // -50°C → purple(270°), -20°C → blue(220°), 0°C → cyan-green(160°), +20°C → orange(30°)
+  const stops = [[-50,270],[-20,220],[0,160],[10,100],[20,30]];
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [t0,h0] = stops[i], [t1,h1] = stops[i+1];
+    if (t <= t1) {
+      const f = (t - t0) / (t1 - t0);
+      return h0 + f * (h1 - h0);
+    }
+  }
+  return 30;
+}
+function tempToBand(t) {
+  const hue = tempToHue(t);
+  return `hsla(${hue},70%,55%,0.55)`;
+}
+
+// Draw a standard wind barb at (cx,cy), speed in km/h, dir = "from" direction
+function drawBarb(ctx, cx, cy, speedKmh, dirDeg, scale=14) {
+  const kt = speedKmh / 1.852;
+  ctx.save();
+  ctx.translate(cx, cy);
+  // Rotate: dir is "from", barb points upward in natural orientation then rotated
+  ctx.rotate((dirDeg) * Math.PI / 180);
+  ctx.strokeStyle = '#222';
+  ctx.fillStyle = '#222';
+  ctx.lineWidth = 1.2;
+
+  if (kt < 2.5) {
+    ctx.beginPath(); ctx.arc(0, 0, 3, 0, 2*Math.PI); ctx.stroke();
+    ctx.restore(); return;
+  }
+
+  // Shaft pointing "from" direction (upward before rotation)
+  const L = scale * 1.8;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -L); ctx.stroke();
+
+  let rem = kt, y = -L;
+  const pennants = Math.floor(rem / 50); rem -= pennants * 50;
+  const fulls    = Math.floor(rem / 10); rem -= fulls * 10;
+  const halfs    = rem >= 5 ? 1 : 0;
+
+  // Pennants (filled triangles)
+  for (let i = 0; i < pennants; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(scale * 0.85, y + scale * 0.5);
+    ctx.lineTo(0, y + scale * 0.85);
+    ctx.closePath(); ctx.fill();
+    y += scale * 0.85;
+  }
+  if (pennants) y += scale * 0.2;
+
+  // Full barbs
+  for (let i = 0; i < fulls; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(scale * 0.9, y + scale * 0.35);
+    ctx.stroke();
+    y += scale * 0.45;
+  }
+
+  // Half barb
+  if (halfs) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(scale * 0.45, y + scale * 0.18);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function drawMeteogramCanvas(canvasId, hourly, dayIndex) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const data = METEO_HOURS.map(h => getHour(hourly, getIdx(hourly, dayIndex, h)));
+  const N = METEO_HOURS.length; // 19 points (5h→23h)
+
+  const ML = 52, MR = 12, MT = 48, MB = 8;
+  const CW = W - ML - MR;
+  const xPos = i => ML + (i / (N - 1)) * CW;
+
+  const S = {
+    temp:   { y: MT,        h: 72 },
+    wind:   { y: MT + 72,   h: 58 },
+    cloud:  { y: MT + 130,  h: 70 },
+    precip: { y: MT + 200,  h: 46 },
+    base:   { y: MT + 246,  h: 28 },
+  };
+  const TOTAL = 274;
+
+  // — Background —
+  ctx.fillStyle = '#f5f8fc';
+  ctx.fillRect(0, 0, W, H);
+
+  // Night shading
+  data.forEach((d, i) => {
+    if (i === N-1) return;
+    const h = METEO_HOURS[i];
+    if (h < 6 || h >= 20) {
+      ctx.fillStyle = 'rgba(0,0,40,0.06)';
+      ctx.fillRect(xPos(i), MT, xPos(i+1) - xPos(i), TOTAL);
+    }
+  });
+
+  // Vertical grid every hour (faint) and every 3h (stronger)
+  METEO_HOURS.forEach((h, i) => {
+    ctx.strokeStyle = h % 3 === 0 ? '#c0ccd8' : '#e2e8f0';
+    ctx.lineWidth = h % 3 === 0 ? 0.8 : 0.4;
+    ctx.beginPath(); ctx.moveTo(xPos(i), MT); ctx.lineTo(xPos(i), MT + TOTAL); ctx.stroke();
+  });
+
+  // Section separators
+  ctx.strokeStyle = '#aab8c8'; ctx.lineWidth = 1;
+  [S.wind.y, S.cloud.y, S.precip.y, S.base.y].forEach(y => {
+    ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(W - MR, y); ctx.stroke();
+  });
+
+  // — HOUR LABELS (every hour) —
+  ctx.textAlign = 'center';
+  METEO_HOURS.forEach((h, i) => {
+    const is3h = h % 3 === 0;
+    ctx.font = is3h ? 'bold 10px sans-serif' : '8px sans-serif';
+    ctx.fillStyle = is3h ? '#334' : '#889';
+    ctx.fillText(h, xPos(i), MT - 30);
+  });
+  ctx.font = '8px sans-serif'; ctx.fillStyle = '#889'; ctx.textAlign = 'left';
+  ctx.fillText('heure', 2, MT - 30);
+
+  // — WEATHER SYMBOLS every hour —
+  ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (!d) return;
+    const icon = d.precip > 0.2 ? '🌧️' : d.cloud > 75 ? '☁️' : d.cloud > 35 ? '⛅' : '☀️';
+    ctx.fillText(icon, xPos(i), MT - 12);
+  });
+
+  // — TEMPERATURE + DEW POINT —
+  const vals = data.map(d => d ? [d.temp, d.dew] : [null, null]);
+  const allT = vals.flat().filter(v => v !== null);
+  const tMin = Math.min(...allT) - 2, tMax = Math.max(...allT) + 3;
+  const ty = v => S.temp.y + S.temp.h - ((v - tMin) / (tMax - tMin)) * S.temp.h;
+
+  if (tMin < 0 && tMax > 0) {
+    ctx.strokeStyle = 'rgba(0,100,200,0.2)'; ctx.lineWidth = 1; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(ML, ty(0)); ctx.lineTo(W-MR, ty(0)); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Dew point (blue dashed)
+  ctx.strokeStyle = '#5590cc'; ctx.lineWidth = 1.4; ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  vals.forEach(([, dew], i) => {
+    if (dew === null) return;
+    i===0 || vals[i-1][1]===null ? ctx.moveTo(xPos(i), ty(dew)) : ctx.lineTo(xPos(i), ty(dew));
+  });
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Temperature (red)
+  ctx.strokeStyle = '#cc2020'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  vals.forEach(([t], i) => {
+    if (t===null) return;
+    i===0 || vals[i-1][0]===null ? ctx.moveTo(xPos(i), ty(t)) : ctx.lineTo(xPos(i), ty(t));
+  });
+  ctx.stroke();
+
+  // Temp values every 2h
+  ctx.font = '9px sans-serif'; ctx.fillStyle = '#cc2020'; ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (!d || METEO_HOURS[i] % 2 !== 1) return;
+    ctx.fillText(Math.round(d.temp)+'°', xPos(i), ty(d.temp) - 3);
+  });
+
+  ctx.font='9px sans-serif'; ctx.fillStyle='#778'; ctx.textAlign='left';
+  ctx.fillText('°C', 2, S.temp.y + 11);
+  ctx.fillStyle='#5590cc'; ctx.fillText('- - point de rosée', 2, S.temp.y + 22);
+
+  // — VENT + RAFALES (lignes seulement, pas d'aire) —
+  const winds = data.map(d => d ? d.ws : 0);
+  const gusts = data.map(d => d ? d.gusts : 0);
+  const wMax  = Math.max(...gusts, 20);
+  const wy    = v => S.wind.y + S.wind.h - (v / wMax) * S.wind.h;
+
+  // Axe Y vent — graduations à 0, 10, 20, 30 km/h
+  const wTicks = [0, 10, 20, 30, 40].filter(v => v <= wMax + 5);
+  wTicks.forEach(v => {
+    const y = wy(v);
+    // Ligne de grille légère
+    ctx.strokeStyle = 'rgba(150,170,190,0.35)'; ctx.lineWidth = 0.6;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(W - MR, y); ctx.stroke();
+    ctx.setLineDash([]);
+    // Tiret sur l'axe
+    ctx.strokeStyle = '#99aabb'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ML - 4, y); ctx.lineTo(ML, y); ctx.stroke();
+    // Valeur
+    ctx.font = '8px sans-serif'; ctx.fillStyle = '#556'; ctx.textAlign = 'right';
+    ctx.fillText(v, ML - 6, y + 3);
+  });
+
+  // Rafales (orange line)
+  ctx.strokeStyle = '#e07010'; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
+  ctx.beginPath();
+  gusts.forEach((g, i) => {
+    i===0 ? ctx.moveTo(xPos(i), wy(g)) : ctx.lineTo(xPos(i), wy(g));
+  });
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Vent moyen (blue line)
+  ctx.strokeStyle = '#1a6acc'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  winds.forEach((w, i) => {
+    i===0 ? ctx.moveTo(xPos(i), wy(w)) : ctx.lineTo(xPos(i), wy(w));
+  });
+  ctx.stroke();
+
+  // Valeurs vent km/h + flèche direction every 2h
+  ctx.textAlign = 'center';
+  // Direction du vent : flèche + label cardinal toutes les 3h
+  const toCardinal = deg => {
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+    return dirs[Math.round(deg / 22.5) % 16];
+  };
+  data.forEach((d, i) => {
+    if (!d) return;
+    const h = METEO_HOURS[i];
+    const showLabel = (h % 3 === 0);
+    const showValue = (h % 2 === 0);
+    const x = xPos(i);
+    const isSouth = d.wd >= SOUTH_MIN && d.wd <= SOUTH_MAX;
+    const col = isSouth ? '#bb1111' : '#1155aa';
+
+    // Valeur vent toutes les 2h
+    if (showValue && d.ws > 0) {
+      ctx.fillStyle = col; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(Math.round(d.ws), x, wy(d.ws) - 3);
+    }
+
+    // Flèche direction + label cardinal toutes les 3h
+    if (showLabel) {
+      const ay = S.wind.y + S.wind.h - 14; // zone basse de la section vent
+      const rad = (d.wd - 90) * Math.PI / 180; // 0° = N = haut
+      const L = 9; // longueur demi-flèche
+      const tx = x + Math.cos(rad) * L, ty = ay + Math.sin(rad) * L; // pointe
+      const bx = x - Math.cos(rad) * L, by = ay - Math.sin(rad) * L; // queue
+      // Tige
+      ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(tx, ty); ctx.stroke();
+      // Tête de flèche
+      const hw = 3.5, ha = rad + Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx + Math.cos(ha - 0.5)*hw, ty + Math.sin(ha - 0.5)*hw);
+      ctx.lineTo(tx + Math.cos(ha + 0.5)*hw, ty + Math.sin(ha + 0.5)*hw);
+      ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+      // Label cardinal en dessous
+      ctx.font = 'bold 7px sans-serif'; ctx.fillStyle = col; ctx.textAlign = 'center';
+      ctx.fillText(toCardinal(d.wd), x, S.wind.y + S.wind.h - 1);
+    }
+  });
+
+  ctx.font='9px sans-serif'; ctx.fillStyle='#778'; ctx.textAlign='left';
+  ctx.fillText('km/h', 2, S.wind.y + 11);
+  ctx.fillStyle='#1a6acc'; ctx.fillText('— vent', 2, S.wind.y + 22);
+  ctx.fillStyle='#e07010'; ctx.fillText('- - rafales', 2, S.wind.y + 32);
+
+  // — NUAGES PAR ALTITUDE —
+  const cloudRows = [
+    { label:'~9000m', cover: i => data[i] ? data[i].cloudHigh * 0.4 : 0 },
+    { label:'~5500m', cover: i => data[i] ? data[i].cloudHigh : 0 },
+    { label:'~3000m', cover: i => data[i] ? data[i].cloudMid : 0 },
+    { label:'~2000m', cover: i => data[i] ? (data[i].cloudLow*0.6 + data[i].cloudMid*0.4) : 0 },
+    { label:'~900m',  cover: i => data[i] ? data[i].cloudLow : 0 },
+  ];
+  const rowH = S.cloud.h / cloudRows.length;
+
+  cloudRows.forEach((row, r) => {
+    const rowY = S.cloud.y + r * rowH;
+    ctx.font='8px sans-serif'; ctx.fillStyle='#445'; ctx.textAlign='left';
+    ctx.fillText(row.label, 2, rowY + rowH * 0.72);
+    data.forEach((d, i) => {
+      if (i === N-1) return;
+      const cover = Math.min(100, row.cover(i));
+      ctx.fillStyle = `rgba(55,75,105,${cover/100*0.9})`;
+      ctx.fillRect(xPos(i), rowY+1, xPos(i+1)-xPos(i)-0.5, rowH-2);
+    });
+  });
+
+  // ── LÉGENDES BAS DU CANVAS ──
+  {
+    const legY = S.base.y + S.base.h + 18; // plus bas que la dernière section
+    const lgh  = 8;
+
+    // — Couverture nuageuse (gauche) —
+    const lgx = ML, lgw = 110;
+    const lgGrad = ctx.createLinearGradient(lgx, 0, lgx + lgw, 0);
+    lgGrad.addColorStop(0, 'rgba(55,75,105,0)');
+    lgGrad.addColorStop(1, 'rgba(55,75,105,0.92)');
+    ctx.fillStyle = lgGrad;
+    ctx.fillRect(lgx, legY, lgw, lgh);
+    ctx.strokeStyle = '#99aabb'; ctx.lineWidth = 0.5;
+    ctx.strokeRect(lgx, legY, lgw, lgh);
+    ctx.font = '8px sans-serif'; ctx.fillStyle = '#556';
+    ctx.textAlign = 'left';  ctx.fillText('0%',   lgx,       legY + lgh + 9);
+    ctx.textAlign = 'right'; ctx.fillText('100%', lgx + lgw, legY + lgh + 9);
+    ctx.textAlign = 'center';ctx.fillText('Couverture nuageuse', lgx + lgw / 2, legY - 3);
+
+    // — Base nuages (à droite de la couverture) —
+    const bx = lgx + lgw + 18;
+    ctx.font = '8px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#556'; ctx.fillText('Base nuages :', bx, legY - 3);
+    ctx.font = '7px sans-serif';
+    ctx.fillStyle = '#cc1111'; ctx.fillText('■ < ' + DECOLLAGE_ALT_M + 'm (sous déco)', bx,       legY + lgh + 9);
+    ctx.fillStyle = '#bb6600'; ctx.fillText('■ ' + DECOLLAGE_ALT_M + '–2200m',          bx + 130, legY + lgh + 9);
+    ctx.fillStyle = '#226611'; ctx.fillText('■ > 2200m',                                 bx + 240, legY + lgh + 9);
+  }
+
+  // — Lignes décollage + atterrissage dans la section nuages —
+  // Interpolation altitude → Y dans la section cloud
+  // Points de contrôle (centre de chaque row) : alts=[9000,5500,3000,2000,900], y=S.cloud.y+(r+0.5)*rowH
+  const cloudAltY = (altM) => {
+    const alts = [9000, 5500, 3000, 2000, 900];
+    const ys   = alts.map((_, r) => S.cloud.y + (r + 0.5) * rowH);
+    for (let i = 0; i < alts.length - 1; i++) {
+      if (altM <= alts[i] && altM >= alts[i+1]) {
+        const f = (alts[i] - altM) / (alts[i] - alts[i+1]);
+        return ys[i] + f * (ys[i+1] - ys[i]);
+      }
+    }
+    return altM > alts[0] ? ys[0] : ys[ys.length-1];
+  };
+  const decoCloudY  = cloudAltY(DECOLLAGE_ALT_M);
+  const attrCloudY  = cloudAltY(ATTERRISSAGE_ALT_M);
+
+  // Ligne décollage (rouge)
+  ctx.save();
+  ctx.strokeStyle = '#cc3300'; ctx.lineWidth = 1.2; ctx.setLineDash([5, 3]);
+  ctx.beginPath(); ctx.moveTo(ML, decoCloudY); ctx.lineTo(W - MR, decoCloudY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = 'bold 7px sans-serif'; ctx.fillStyle = '#cc3300'; ctx.textAlign = 'right';
+  ctx.fillText('✈ déco ~1600m', W - MR - 2, decoCloudY - 2);
+  ctx.restore();
+
+  // Ligne atterrissage (vert)
+  ctx.save();
+  ctx.strokeStyle = '#2a7a2a'; ctx.lineWidth = 1.2; ctx.setLineDash([5, 3]);
+  ctx.beginPath(); ctx.moveTo(ML, attrCloudY); ctx.lineTo(W - MR, attrCloudY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = 'bold 7px sans-serif'; ctx.fillStyle = '#2a7a2a'; ctx.textAlign = 'right';
+  ctx.fillText('⬇ attr ~950m', W - MR - 2, attrCloudY - 2);
+  ctx.restore();
+
+  // — PRÉCIPITATIONS —
+  const maxP = Math.max(...data.map(d => d ? d.precip : 0), 2);
+  const py = v => S.precip.y + S.precip.h - (v / maxP) * S.precip.h;
+  const bw = (CW / N) * 0.75;
+
+  data.forEach((d, i) => {
+    if (!d || d.precip <= 0) return;
+    ctx.fillStyle = '#2255cc';
+    const y = py(d.precip);
+    ctx.fillRect(xPos(i) - bw/2, y, bw, S.precip.y + S.precip.h - y);
+    if (d.precip >= 0.2) {
+      ctx.fillStyle='#2255cc'; ctx.font='8px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(d.precip.toFixed(1), xPos(i), y - 2);
+    }
+  });
+  ctx.font='9px sans-serif'; ctx.fillStyle='#778'; ctx.textAlign='left';
+  ctx.fillText('mm', 2, S.precip.y + 11);
+
+  // — BASE NUAGES (estimée via T - Td × 125m) —
+  ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (!d || METEO_HOURS[i] % 3 !== 0) return;
+    const col = d.cloudBase < DECOLLAGE_ALT_M ? '#cc1111'
+              : d.cloudBase < 2200            ? '#bb6600'
+              :                                 '#226611';
+    ctx.fillStyle = col;
+    ctx.fillText(d.cloudBase + 'm', xPos(i), S.base.y + 18);
+  });
+  // Label section (gauche)
+  ctx.fillStyle = '#556'; ctx.textAlign = 'left'; ctx.font = '8px sans-serif';
+  ctx.fillText('Base nuages', 2, S.base.y + 11);
+  ctx.fillText('estimée', 2, S.base.y + 21);
+
+  // — BORDURE —
+  ctx.strokeStyle='#99aabb'; ctx.lineWidth=1;
+  ctx.strokeRect(ML, MT, CW, TOTAL);
+}
+
+function drawAirgramCanvas(canvasId, hourly, dayIndex) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // ML large pour labels pression sans chevauchement avec la 1ère barbe
+  const ML = 76, MR = 14, MT = 28, MB = 42;
+  const CW = W - ML - MR;
+  const CH = H - MT - MB;
+
+  const N = AIRGRAM_HOURS.length; // 19 points horaires
+  const data = AIRGRAM_HOURS.map(h => getHour(hourly, getIdx(hourly, dayIndex, h)));
+
+  const xPos = i => ML + (i / (N - 1)) * CW;
+  const yPos = r => MT + (r / (PRESSURE_LEVELS.length - 1)) * CH;
+
+  // Altitudes clés interpolées entre niveaux de pression (MSL)
+  const LEVEL_ALTS = { '300':9000, '500':5500, '700':3000, '850':1500, '925':750, '1000':0 };
+  const airAltY = (altM) => {
+    const pts = PRESSURE_LEVELS.map((l, r) => ({ alt: LEVEL_ALTS[l.key], y: yPos(r) }));
+    for (let i = 0; i < pts.length - 1; i++) {
+      const hi = pts[i], lo = pts[i+1];
+      if (altM <= hi.alt && altM >= lo.alt) {
+        const f = (hi.alt - altM) / (hi.alt - lo.alt);
+        return hi.y + f * (lo.y - hi.y);
+      }
+    }
+    return altM > pts[0].alt ? pts[0].y : pts[pts.length-1].y;
+  };
+  const decoY  = airAltY(DECOLLAGE_ALT_M);
+  const attrY  = airAltY(ATTERRISSAGE_ALT_M);
+
+  // — Fond —
+  ctx.fillStyle = '#f5f8fc';
+  ctx.fillRect(0, 0, W, H);
+
+  // — Couleurs température par bande —
+  for (let r = 0; r < PRESSURE_LEVELS.length; r++) {
+    const tKey = `t${PRESSURE_LEVELS[r].key}`;
+    for (let i = 0; i < N - 1; i++) {
+      const d0 = data[i], d1 = data[i+1];
+      const t0 = d0?.[tKey] ?? null, t1 = d1?.[tKey] ?? null;
+      const tAvg = (t0 !== null && t1 !== null) ? (t0+t1)/2 : (t0 ?? t1 ?? -20);
+      const x1 = xPos(i), x2 = xPos(i+1);
+      const y1 = r === 0 ? MT : (yPos(r-1)+yPos(r))/2;
+      const y2 = r === PRESSURE_LEVELS.length-1 ? MT+CH : (yPos(r)+yPos(r+1))/2;
+      ctx.fillStyle = tempToBand(tAvg);
+      ctx.fillRect(x1, y1, x2-x1+0.5, y2-y1+0.5);
+    }
+  }
+
+  // — Clipping : barbes ne débordent pas sur la zone labels —
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(ML, MT - 2, CW, CH + 4);
+  ctx.clip();
+
+  // — Grille verticale (fine aux heures intermédiaires, marquée aux multiples de 3h) —
+  AIRGRAM_HOURS.forEach((h, i) => {
+    const is3h = (h % 3 === 0);
+    ctx.strokeStyle = is3h ? 'rgba(0,0,0,0.22)' : 'rgba(0,0,0,0.08)';
+    ctx.lineWidth   = is3h ? 0.9 : 0.4;
+    ctx.beginPath(); ctx.moveTo(xPos(i), MT); ctx.lineTo(xPos(i), MT+CH); ctx.stroke();
+  });
+
+  // — Barbes de vent (toutes les heures) —
+  PRESSURE_LEVELS.forEach((lvl, r) => {
+    data.forEach((d, i) => {
+      if (!d) return;
+      const ws = d[`ws${lvl.key}`], wd = d[`wd${lvl.key}`];
+      if (ws == null || wd == null) return;
+      drawBarb(ctx, xPos(i), yPos(r), ws, wd, 9);
+    });
+  });
+
+  ctx.restore(); // fin clipping
+
+  // — Grille horizontale (niveaux de pression) —
+  ctx.strokeStyle = 'rgba(0,0,0,0.28)'; ctx.lineWidth = 0.8;
+  PRESSURE_LEVELS.forEach((_, r) => {
+    ctx.beginPath(); ctx.moveTo(ML, yPos(r)); ctx.lineTo(W-MR, yPos(r)); ctx.stroke();
+  });
+
+  // — Ligne décollage ~1600m MSL (annoté sur la ligne 850 hPa) —
+  // Ligne décollage ~1600m (rouge)
+  ctx.save();
+  ctx.strokeStyle = '#cc3300'; ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
+  ctx.beginPath(); ctx.moveTo(ML, decoY); ctx.lineTo(W - MR, decoY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'right';
+  const badgeDeco = '✈ Déco ~1600m';
+  const bwDeco = ctx.measureText(badgeDeco).width + 8;
+  ctx.fillStyle = '#cc3300';
+  ctx.fillRect(W - MR - bwDeco, decoY - 11, bwDeco, 12);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(badgeDeco, W - MR - 2, decoY - 1);
+  ctx.restore();
+
+  // Ligne atterrissage ~950m (vert)
+  ctx.save();
+  ctx.strokeStyle = '#2a7a2a'; ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
+  ctx.beginPath(); ctx.moveTo(ML, attrY); ctx.lineTo(W - MR, attrY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'right';
+  const badgeAttr = '⬇ Attr ~950m';
+  const bwAttr = ctx.measureText(badgeAttr).width + 8;
+  ctx.fillStyle = '#2a7a2a';
+  ctx.fillRect(W - MR - bwAttr, attrY - 11, bwAttr, 12);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(badgeAttr, W - MR - 2, attrY - 1);
+  ctx.restore();
+
+  // — Labels pression gauche (fond blanc pour lisibilité) —
+  ctx.textAlign = 'right';
+  PRESSURE_LEVELS.forEach((lvl, r) => {
+    const y = yPos(r);
+    ctx.fillStyle = 'rgba(245,248,252,0.9)';
+    ctx.fillRect(1, y - 12, ML - 3, 23);
+    ctx.font = 'bold 9px sans-serif'; ctx.fillStyle = '#112';
+    ctx.fillText(lvl.label, ML - 4, y + 2);
+    ctx.font = '7px sans-serif'; ctx.fillStyle = '#445';
+    ctx.fillText(lvl.alt + ' MSL', ML - 4, y + 11);
+  });
+
+  // — Axe temps haut (labels toutes les 3h, + 5h) —
+  ctx.font = 'bold 10px sans-serif'; ctx.fillStyle = '#223'; ctx.textAlign = 'center';
+  AIRGRAM_HOURS.forEach((h, i) => {
+    if (h % 3 !== 0 && h !== 5) return;
+    ctx.fillText(h + 'h', xPos(i), MT - 10);
+  });
+
+  // — Axe temps bas (labels toutes les 3h) —
+  ctx.strokeStyle = '#778899'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(ML, MT+CH); ctx.lineTo(W-MR, MT+CH); ctx.stroke();
+  AIRGRAM_HOURS.forEach((h, i) => {
+    if (h % 3 !== 0 && h !== 5) return;
+    ctx.strokeStyle = '#778899'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(xPos(i), MT+CH); ctx.lineTo(xPos(i), MT+CH+4); ctx.stroke();
+    ctx.font = 'bold 10px sans-serif'; ctx.fillStyle = '#334'; ctx.textAlign = 'center';
+    ctx.fillText(h + 'h', xPos(i), MT+CH+15);
+  });
+  ctx.font = '7px sans-serif'; ctx.fillStyle = '#889'; ctx.textAlign = 'left';
+  ctx.fillText('heure locale', 2, MT+CH+15);
+
+  // — Bordure —
+  ctx.strokeStyle = '#99aabb'; ctx.lineWidth = 1;
+  ctx.strokeRect(ML, MT, CW, CH);
+
+  // — Légende températures bas droite —
+  const legW = Math.min(240, CW * 0.32);
+  const legX = W - MR - legW;
+  const legY = MT + CH + 24;
+  const grad = ctx.createLinearGradient(legX, 0, legX+legW, 0);
+  grad.addColorStop(0,    tempToBand(-40));
+  grad.addColorStop(0.33, tempToBand(-10));
+  grad.addColorStop(0.5,  tempToBand(0));
+  grad.addColorStop(0.75, tempToBand(10));
+  grad.addColorStop(1,    tempToBand(20));
+  ctx.fillStyle = grad;
+  ctx.fillRect(legX, legY, legW, 7);
+  ctx.strokeStyle = '#99aabb'; ctx.lineWidth = 0.5; ctx.strokeRect(legX, legY, legW, 7);
+  [-40,-20,0,10,20].forEach(t => {
+    const x = legX + ((t+40)/60)*legW;
+    ctx.font = '7px sans-serif'; ctx.fillStyle = '#334'; ctx.textAlign = 'center';
+    ctx.fillText(t + '°C', x, legY + 17);
+  });
+  ctx.font = '7px sans-serif'; ctx.fillStyle = '#889'; ctx.textAlign = 'left';
+  ctx.fillText('Températures (°C)', legX, legY - 2);
+  // Note MSL
+  ctx.font = '7px sans-serif'; ctx.fillStyle = '#889'; ctx.textAlign = 'left';
+  ctx.fillText('Altitudes au-dessus du niveau de la mer (MSL)', ML, MT + CH + 38);
+}
+
+// ══════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════
+let currentDay = 0;
+function switchDay(i) {
+  currentDay = i;
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', j === i));
+  document.querySelectorAll('.day-panel').forEach((p, j) => p.classList.toggle('active', j === i));
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+async function init() {
+  document.getElementById('loading').style.display = 'flex';
+  document.querySelectorAll('.day-panel').forEach(p => { p.classList.remove('active'); p.innerHTML = ''; });
+
+  try {
+    const data = await fetchWeather();
+    const h = data.hourly;
+
+    // Update tab dates
+    [0, 1, 2, 3, 4, 5].forEach(i => {
+      const d = getDayDate(h, i);
+      document.getElementById(`tab-date-${i}`).textContent = fmtDateShort(d);
+    });
+
+    // Render all 6 days
+    [0, 1, 2, 3, 4, 5].forEach(i => renderDay(i, h));
+
+    document.getElementById('loading').style.display = 'none';
+    switchDay(currentDay);
+
+    const now = new Date();
+    document.getElementById('lastUpdate').textContent =
+      `Mis à jour ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+
+  } catch (err) {
+    document.getElementById('loading').innerHTML =
+      `<span class="c-red">❌ Erreur : ${err.message}</span>
+       <button class="refresh-btn" onclick="init()" style="margin-top:12px">Réessayer</button>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
