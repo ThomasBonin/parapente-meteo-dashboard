@@ -293,6 +293,21 @@ header {
   position: relative;
 }
 .iframe-wrap iframe { width: 100%; border: none; display: block; }
+.mb-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #1a3050;
+  border: 1px solid #2a5080;
+  border-radius: 8px;
+  color: #7ec8f0;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.mb-link-btn:hover { background: #1e4060; }
 .iframe-link {
   display: block;
   text-align: right;
@@ -428,7 +443,10 @@ async function fetchWeather() {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=${vars}&wind_speed_unit=kmh&forecast_days=7&timezone=Europe%2FParis`;
   const r = await fetch(url);
   if (!r.ok) throw new Error(`API ${r.status}`);
-  return r.json();
+  const json = await r.json();
+  // Stocker l'élévation de la station pour le calcul de base nuages
+  window._stationElevation = json.elevation ?? 950;
+  return json;
 }
 
 // ══════════════════════════════════════════
@@ -465,7 +483,9 @@ function getHour(h, idx) {
     ws700:  h.windspeed_700hPa[idx],  wd700:  h.winddirection_700hPa[idx],  t700:  h.temperature_700hPa[idx],
     ws500:  h.windspeed_500hPa[idx],  wd500:  h.winddirection_500hPa[idx],  t500:  h.temperature_500hPa[idx],
     ws300:  h.windspeed_300hPa[idx],  wd300:  h.winddirection_300hPa[idx],  t300:  h.temperature_300hPa[idx],
-    cloudBase:  Math.round((h.temperature_2m[idx] - h.dewpoint_2m[idx]) * 125)
+    // Base nuages = LCL au-dessus du sol + altitude de la station (MSL)
+    // Open-Meteo renvoie l'élévation dans _stationElevation (stockée au fetch)
+    cloudBase: Math.round((h.temperature_2m[idx] - h.dewpoint_2m[idx]) * 125) + (window._stationElevation || 950)
   };
 }
 
