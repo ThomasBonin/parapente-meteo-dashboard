@@ -436,11 +436,10 @@ async function fetchWeather() {
     'windspeed_925hPa', 'winddirection_925hPa', 'temperature_925hPa',
     'windspeed_850hPa', 'winddirection_850hPa', 'temperature_850hPa',
     'windspeed_700hPa', 'winddirection_700hPa', 'temperature_700hPa',
-    'windspeed_500hPa', 'winddirection_500hPa', 'temperature_500hPa',
-    'windspeed_300hPa', 'winddirection_300hPa', 'temperature_300hPa'
+    'windspeed_500hPa', 'winddirection_500hPa', 'temperature_500hPa'
   ].join(',');
 
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=${vars}&wind_speed_unit=kmh&forecast_days=7&timezone=Europe%2FParis`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=${vars}&wind_speed_unit=kmh&forecast_days=6&timezone=Europe%2FParis`;
   const r = await fetch(url);
   if (!r.ok) throw new Error(`API ${r.status}`);
   const json = await r.json();
@@ -482,7 +481,7 @@ function getHour(h, idx) {
     ws850:  h.windspeed_850hPa[idx],  wd850:  h.winddirection_850hPa[idx],  t850:  h.temperature_850hPa[idx],
     ws700:  h.windspeed_700hPa[idx],  wd700:  h.winddirection_700hPa[idx],  t700:  h.temperature_700hPa[idx],
     ws500:  h.windspeed_500hPa[idx],  wd500:  h.winddirection_500hPa[idx],  t500:  h.temperature_500hPa[idx],
-    ws300:  h.windspeed_300hPa[idx],  wd300:  h.winddirection_300hPa[idx],  t300:  h.temperature_300hPa[idx],
+
     // Base nuages = LCL au-dessus du sol + altitude de la station (MSL)
     // Open-Meteo renvoie l'élévation dans _stationElevation (stockée au fetch)
     cloudBase: Math.round((h.temperature_2m[idx] - h.dewpoint_2m[idx]) * 125) + (window._stationElevation || 950)
@@ -881,7 +880,6 @@ const AIRGRAM_HOURS = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
 const DECOLLAGE_ALT_M   = 1600; // Décollage du 600 ~ 1600m MSL
 const ATTERRISSAGE_ALT_M = 950; // Atterrissage vallée Loudenvielle ~ 950m MSL
 const PRESSURE_LEVELS = [
-  { key:'300',  label:'300 hPa', alt:'~9km'   },
   { key:'500',  label:'500 hPa', alt:'~5.5km' },
   { key:'700',  label:'700 hPa', alt:'~3km'   },
   { key:'850',  label:'850 hPa', alt:'~1.5km' },
@@ -1302,7 +1300,7 @@ function drawAirgramCanvas(canvasId, hourly, dayIndex) {
   const yPos = r => MT + (r / (PRESSURE_LEVELS.length - 1)) * CH;
 
   // Altitudes clés interpolées entre niveaux de pression (MSL)
-  const LEVEL_ALTS = { '300':9000, '500':5500, '700':3000, '850':1500, '925':750, '1000':0 };
+  const LEVEL_ALTS = { '500':5500, '700':3000, '850':1500, '925':750, '1000':0 };
   const airAltY = (altM) => {
     const pts = PRESSURE_LEVELS.map((l, r) => ({ alt: LEVEL_ALTS[l.key], y: yPos(r) }));
     for (let i = 0; i < pts.length - 1; i++) {
