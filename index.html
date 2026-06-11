@@ -1494,9 +1494,11 @@ async function init() {
       `Mis à jour ${now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
 
   } catch (err) {
+    const isNetwork = err.message.includes('fetch') || err.message.includes('network') || err.message.includes('502') || err.message.includes('Failed');
     document.getElementById('loading').innerHTML =
-      `<span class="c-red">❌ Erreur : ${err.message}</span>
-       <button class="refresh-btn" onclick="init()" style="margin-top:12px">Réessayer</button>`;
+      `<span class="c-red">❌ Erreur : ${err.message}</span><br>
+       ${isNetwork ? '<span style="color:#aaa;font-size:13px">⚠️ L\'API météo est peut-être temporairement indisponible. Réessayez dans quelques minutes.</span><br>' : ''}
+       <button class="refresh-btn" onclick="init()" style="margin-top:12px">🔄 Réessayer</button>`;
   }
 }
 
